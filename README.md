@@ -92,7 +92,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## ✨ Author
 
 Dhaval Pawar  
-[LinkedIn](https://www.linkedin.com/in/dhaval-pawar/) | [Portfolio](#)
+[LinkedIn](https://www.linkedin.com/in/dhaval-pawar/) | [Portfolio](https://dhavalpawar15.vercel.app/)
 
 ---
 
