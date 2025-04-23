@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  
+  <title>AI 3D Furniture Customizer</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body { 
+      margin: 0; 
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      position: relative;
+      width: 800px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    #viewer-container {
+      position: relative;
+      width: 600px;
+      height: 600px;
+      margin: 0 auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    #viewer {
+      width: 100%;
+      height: 100%;
+      background-color: #eee;
+    }
+    
+    #controls {
+      position: absolute;
+      top: 0;
+      right: -220px;
+      width: 200px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    #controls label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    
+    #controls input {
+      width: 100%;
+      margin-top: 5px;
+    }
+    
+    #controls button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    
+    #controls button:hover {
+      background-color: #45a049;
+    }
+    
+    #zoom-controls {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    #zoom-controls button {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    #zoom-controls button:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+    
+    #debugInfo {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    #model-controls {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+#modelSelector {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.upload-container {
+  margin-top: 10px;
+}
+
+.upload-label {
+  cursor: pointer;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.upload-btn {
+  width: 100%;
+  padding: 8px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.upload-btn:hover {
+  background-color: #1976D2;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="loadingOverlay" style="display: none;">
+      <div class="spinner"></div>
+      <div class="loading-text">Processing...</div>
+    </div>
+    <div id="viewer-container">
+      <div id="viewer"></div>
+      
+      <div id="zoom-controls">
+        <button id="zoom-in" title="Zoom In">+</button>
+        <button id="zoom-out" title="Zoom Out">-</button>
+      </div>
+      
+      <div id="debugInfo">Loading debug info...</div>
+    </div>
+    
+    <div id="controls">
+      <h3>Customize Model</h3>
+      <div id="model-controls">
+        <label>
+          Select Model:
+          <select id="modelSelector">
+            <option value="">Loading models...</option>
+          </select>
+        </label>
+        
+        <div class="upload-container">
+          <label for="modelUpload" class="upload-label">
+            Upload Model:
+            <input type="file" id="modelUpload" accept=".glb,.gltf" style="display: none;">
+          </label>
+          <button id="uploadButton" class="upload-btn">Choose File</button>
+        </div>
+      </div>
+      <label>
+        Color:
+        <input type="color" id="colorPicker" value="#6B92C2" />
+      </label>
+      
+      <label>
+        Scale:
+        <input type="number" step="0.1" id="scaleInput" value="1.0" min="0.5" max="2.0" />
+      </label>
+      
+      <label>
+        Texture Prompt:
+        <select id="texturePrompt">
+            <option value="">Select a texture...</option>
+            
+            <!-- Basic Materials -->
+            <optgroup label="Basic Materials">
+                <option value="velvet">Velvet</option>
+                <option value="leather">Leather</option>
+                <option value="metal">Metal</option>
+                <option value="steel">Steel</option>
+                <option value="wood">Wood</option>
+            </optgroup>
+    
+            <!-- Metals -->
+            <optgroup label="Metals">
+                <option value="chrome">Chrome</option>
+                <option value="gold">Gold</option>
+                <option value="silver">Silver</option>
+                <option value="copper">Copper</option>
+                <option value="brass">Brass</option>
+                <option value="bronze">Bronze</option>
+                <option value="aluminum">Aluminum</option>
+                <option value="brushed metal">Brushed Metal</option>
+                <option value="rusted metal">Rusted Metal</option>
+            </optgroup>
+    
+            <!-- Woods -->
+            <optgroup label="Woods">
+                <option value="oak">Oak</option>
+                <option value="pine">Pine</option>
+                <option value="mahogany">Mahogany</option>
+                <option value="walnut">Walnut</option>
+                <option value="ebony">Ebony</option>
+                <option value="bamboo">Bamboo</option>
+                <option value="polished wood">Polished Wood</option>
+                <option value="distressed wood">Distressed Wood</option>
+            </optgroup>
+    
+            <!-- Fabrics -->
+            <optgroup label="Fabrics">
+                <option value="silk">Silk</option>
+                <option value="cotton">Cotton</option>
+                <option value="linen">Linen</option>
+                <option value="wool">Wool</option>
+                <option value="satin">Satin</option>
+                <option value="denim">Denim</option>
+                <option value="canvas">Canvas</option>
+            </optgroup>
+    
+            <!-- Stone and Minerals -->
+            <optgroup label="Stone and Minerals">
+                <option value="marble">Marble</option>
+                <option value="granite">Granite</option>
+                <option value="sandstone">Sandstone</option>
+                <option value="limestone">Limestone</option>
+                <option value="quartz">Quartz</option>
+                <option value="slate">Slate</option>
+                <option value="obsidian">Obsidian</option>
+                <option value="jade">Jade</option>
+            </optgroup>
+    
+            <!-- Glass and Ceramics -->
+            <optgroup label="Glass and Ceramics">
+                <option value="glass">Glass</option>
+                <option value="frosted glass">Frosted Glass</option>
+                <option value="ceramic">Ceramic</option>
+                <option value="porcelain">Porcelain</option>
+                <option value="terracotta">Terracotta</option>
+            </optgroup>
+    
+            <!-- Synthetic Materials -->
+            <optgroup label="Synthetic Materials">
+                <option value="plastic">Plastic</option>
+                <option value="rubber">Rubber</option>
+                <option value="vinyl">Vinyl</option>
+                <option value="carbon fiber">Carbon Fiber</option>
+                <option value="nylon">Nylon</option>
+            </optgroup>
+    
+            <!-- Specialty Finishes -->
+            <optgroup label="Specialty Finishes">
+                <option value="matte paint">Matte Paint</option>
+                <option value="glossy paint">Glossy Paint</option>
+                <option value="metallic paint">Metallic Paint</option>
+                <option value="rust">Rust</option>
+                <option value="patina">Patina</option>
+                <option value="weathered">Weathered</option>
+                <option value="polished">Polished</option>
+                <option value="brushed">Brushed</option>
+                <option value="hammered">Hammered</option>
+            </optgroup>
+    
+            <!-- Composite Textures -->
+            <optgroup label="Composite Textures">
+                <option value="velvet red floral">Velvet Red Floral</option>
+                <option value="worn brown leather">Worn Brown Leather</option>
+                <option value="polished chrome metal">Polished Chrome Metal</option>
+                <option value="oak wood grain">Oak Wood Grain</option>
+                <option value="distressed denim">Distressed Denim</option>
+                <option value="italian marble">Italian Marble</option>
+                <option value="brushed aluminum">Brushed Aluminum</option>
+                <option value="aged copper">Aged Copper</option>
+                <option value="wet concrete">Wet Concrete</option>
+                <option value="rough granite">Rough Granite</option>
+            </optgroup>
+        </select>
+    </label>
+      
+      <button onclick="customize()">Apply AI Customization</button>
+    </div>
+  </div>
+
+  <script>
+    // Variables that will be accessed by the viewer.js
+    let zoomSpeed = 0.2;
+    
+    // Check WebGL support
+    window.addEventListener('DOMContentLoaded', function() {
+      const debugInfo = document.getElementById('debugInfo');
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) {
+          debugInfo.innerHTML = 'WebGL not supported. 3D model may not display.';
+          return;
+        }
+        debugInfo.innerHTML = 'WebGL supported. Waiting for model to load...';
+      } catch(e) {
+        debugInfo.innerHTML = 'Error checking WebGL: ' + e.message;
+      }
+      
+      // Set up zoom button event listeners - these will be used by our viewer.js
+      document.getElementById('zoom-in').addEventListener('click', function() {
+        if (window.zoomIn) window.zoomIn();
+      });
+      
+      document.getElementById('zoom-out').addEventListener('click', function() {
+        if (window.zoomOut) window.zoomOut();
+      });
+    });
+    
+    // Note: The actual implementation of these functions will be in viewer.js
+    // These are just placeholders to avoid console errors
+    function customize() {
+      console.log('Customize function will be defined in viewer.js');
+    }
+    
+    function reloadModel() {
+      console.log('ReloadModel function will be defined in viewer.js');
+    }
+    async function loadAvailableModels() {
+  try {
+    const response = await fetch('/api/list-models');
+    const data = await response.json();
+    const selector = document.getElementById('modelSelector');
+    selector.innerHTML = '<option value="">Select a model...</option>';
+    
+    data.models.forEach(model => {
+      const option = document.createElement('option');
+      option.value = model.name;
+      option.textContent = model.name;
+      selector.appendChild(option);
+    });
+  } catch (error) {
+    console.error('Error loading models:', error);
+  }
+}
+
+// Handle model upload
+document.getElementById('uploadButton').addEventListener('click', () => {
+  document.getElementById('modelUpload').click();
+});
+
+document.getElementById('modelUpload').addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch('/api/upload-model', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    if (response.ok) {
+      alert('Model uploaded successfully!');
+      loadAvailableModels(); // Refresh the model list
+    } else {
+      alert('Error: ' + data.error);
+    }
+  } catch (error) {
+    console.error('Error uploading model:', error);
+    alert('Error uploading model');
+  }
+});
+
+// Modify the existing customize function
+async function customize() {
+  const selectedModel = document.getElementById('modelSelector').value;
+  if (!selectedModel) {
+    alert('Please select a model first');
+    return;
+  }
+
+  const color = document.getElementById('colorPicker').value;
+  const scale = document.getElementById('scaleInput').value;
+  const texturePrompt = document.getElementById('texturePrompt').value;
+
+  // Show loading overlay
+  document.getElementById('loadingOverlay').style.display = 'flex';
+
+  try {
+    const response = await fetch('/api/customize-model', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model_filename: selectedModel,
+        color: color,
+        scale: parseFloat(scale),
+        texture_prompt: texturePrompt
+      })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      reloadModel(data.model_url);
+    } else {
+      alert('Error: ' + data.error);
+    }
+  } catch (error) {
+    console.error('Error customizing model:', error);
+    alert('Error customizing model');
+  } finally {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+// Load available models when the page loads
+window.addEventListener('DOMContentLoaded', loadAvailableModels);
+  </script>
+
+  <script type="module" src="/js/viewer.js"></script>
+</body>
+</html>
