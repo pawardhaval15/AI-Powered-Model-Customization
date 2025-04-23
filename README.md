@@ -1,3 +1,4 @@
+
 # 🧊 3D Model Customization Platform
 
 A web-based 3D model customization platform that allows users to upload, view, modify, and personalize 3D models in real-time. Built using modern web technologies including Three.js, React, and Node.js.
@@ -35,3 +36,64 @@ Clone the repo:
 ```bash
 git clone https://github.com/your-username/3d-model-customizer.git
 cd 3d-model-customizer
+```
+
+### Frontend Setup
+
+```bash
+cd client
+npm install
+npm start
+```
+
+### Backend Setup
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+## 📁 Project Structure
+
+```
+3d-model-customizer/
+│
+├── client/         # React frontend
+│   └── ...
+├── server/         # Node.js backend
+│   └── ...
+├── models/         # Sample 3D models
+├── public/         # Static assets
+└── README.md
+```
+
+## 📤 Upload Guidelines
+
+- Supported formats: `.glb`, `.gltf`, `.obj`, `.fbx`
+- Max size: 50MB
+- Upload via the UI or drag-and-drop zone
+
+## 🧪 Future Enhancements
+
+- User accounts and saved projects
+- AR/VR integration
+- Animation and rigging support
+- AI-based texture suggestion
+
+## 🙌 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## 📄 License
+
+[MIT](LICENSE)
+
+## ✨ Author
+
+Dhaval Pawar  
+[LinkedIn](https://www.linkedin.com/in/dhavalpawar-ai) | [Portfolio](#)
+
+---
+
+Feel free to ⭐ the repo if you find it helpful!
