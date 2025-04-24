@@ -34,7 +34,7 @@ A web-based 3D model customization platform that allows users to upload, view, m
 Clone the repo:
 
 ```bash
-git clone https://github.com/your-username/3d-model-customizer.git
+git clone https://github.com/pawardhaval15/AI-Interior.git
 cd 3d-model-customizer
 ```
 
