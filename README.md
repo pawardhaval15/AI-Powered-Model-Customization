@@ -14,7 +14,7 @@ A web-based 3D model customization platform that allows users to upload, view, m
 
 ## 🛠️ Tech Stack
 
-**Frontend:**
+**Frontend:** (working...)
 - React.js
 - Three.js
 - Tailwind CSS / Bootstrap
