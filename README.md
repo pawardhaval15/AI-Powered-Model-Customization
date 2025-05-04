@@ -15,15 +15,17 @@ A web-based 3D model customization platform that allows users to upload, view, m
 ## 🛠️ Tech Stack
 
 **Frontend:** (working...)
+- Flask
 - React.js
 - Three.js
 - Tailwind CSS / Bootstrap
 
 **Backend:**
+- Python
 - Node.js
 - Express.js
 - Multer (for file uploads)
-- MongoDB / MySQL
+- MySQL
 
 ## 🖼️ Screenshots
 
@@ -35,7 +37,7 @@ Clone the repo:
 
 ```bash
 git clone https://github.com/pawardhaval15/AI-Interior.git
-cd 3d-model-customizer
+cd AI-Interior
 ```
 
 ### Frontend Setup
